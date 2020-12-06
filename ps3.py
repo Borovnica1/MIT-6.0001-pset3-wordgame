@@ -13,7 +13,8 @@ import string
 
 VOWELS = 'aeiou'
 CONSONANTS = 'bcdfghjklmnpqrstvwxyz'
-HAND_SIZE = 7
+LETTERS = 'aeioubcdfghjklmnpqrstvwxyz'
+HAND_SIZE = 11
 
 SCRABBLE_LETTER_VALUES = {
     '*':0, 'a': 1, 'b': 3, 'c': 3, 'd': 2, 'e': 1, 'f': 4, 'g': 2, 'h': 4, 'i': 1, 'j': 8, 'k': 5, 'l': 1, 'm': 3, 'n': 1, 'o': 1, 'p': 3, 'q': 10, 'r': 1, 's': 1, 't': 1, 'u': 1, 'v': 4, 'w': 4, 'x': 8, 'y': 4, 'z': 10
@@ -335,7 +336,7 @@ def play_hand(hand, word_list):
                 # Tell the user how many points the word earned,
                 # and the updated total score
                 score += get_word_score(word, calculate_handlen(hand))
-                print('"',word,'"', ' earned ', get_word_score(word, calculate_handlen(hand)),
+                print('"'+word+'"', ' earned ', get_word_score(word, calculate_handlen(hand)),
                 ' points. Total: ', score, ' points')
             # Otherwise (the word is not valid):
                 # Reject invalid word (print a message)
@@ -382,7 +383,18 @@ def substitute_hand(hand, letter):
     returns: dictionary (string -> int)
     """
     
-    pass  # TO DO... Remove this line when you implement this function
+    if letter not in hand: return hand
+    
+    # add letter which is not already in hand
+    newLetter = random.choice(LETTERS)
+    while newLetter in hand:
+        newLetter = random.choice(LETTERS)
+
+    hand[newLetter] = hand[letter]
+    
+    del hand[letter]
+    
+    return hand
        
     
 def play_game(word_list):
@@ -416,7 +428,40 @@ def play_game(word_list):
     word_list: list of lowercase strings
     """
     
-    print("play_game not implemented.") # TO DO... Remove this line when you implement this function
+    hands = int(input('Enter total number of hands: '))
+    firstHand = True
+    replay = 'no'
+    score = 0
+    
+    
+    
+    while hands > 0:
+        if not firstHand:
+            replay = input('Would you like to replay the hand? (yes/no) ')
+
+        if replay == 'no':
+            hand = deal_hand(HAND_SIZE)
+        
+        print('Current Hand: ', end =" ")
+        display_hand(hand)
+        
+        answer = input('Would you like to substitute a letter? (yes/no) ')
+        print('')
+        if answer == 'yes':
+            letter = input('Which letter would you like to replace: ')
+            hand = substitute_hand(hand, letter)
+        
+        handScore = play_hand(hand, word_list)
+        
+        score += handScore 
+        
+        print('Total score for this hand: ', handScore)
+        print('------------------------')
+        
+        firstHand = False
+        hands -= 1
+    
+    print('Total score over all hands: ', score) # TO DO... Remove this line when you implement this function
     
 
 
@@ -428,4 +473,3 @@ def play_game(word_list):
 if __name__ == '__main__':
     word_list = load_words()
     play_game(word_list)
-    play_hand({'c': 1, 'o': 1, '*': 1, 'w': 1, 's': 1, 'z': 1, 'y': 2}, word_list)
